@@ -1,0 +1,22 @@
+package:
+  name: kippenhahn
+  version: "v0.0.1"
+
+source:
+  git_rev: v0.0.1
+  git_url: https://github.com/POSYDON-code/kippenhahn.git
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
+
+test:
+  imports: kippenhahn
+    -
+
+about:
+  home: https://github.com/POSYDON-code/kippenhahn
