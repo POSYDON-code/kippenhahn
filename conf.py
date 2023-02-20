@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# YOURPACKAGE documentation build configuration file, created by
+# kippenhahn documentation build configuration file, created by
 # sphinx-quickstart on Thu Apr 21 14:05:08 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -159,7 +159,7 @@ html_theme = 'sphinx_rtd_theme'
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
-# html_title = u'YOURPACKAGE v0.1'
+# html_title = u'kippenhahn v0.1'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
