@@ -38,13 +38,13 @@ cmdclass.update(versioneer.get_cmdclass())
 
 # -- documentation ------------------------------------------------------------
 
-# import sphinx commands
-try:
-    from sphinx.setup_command import BuildDoc
-except ImportError:
-    pass
-else:
-    cmdclass['build_sphinx'] = BuildDoc
+# # import sphinx commands
+# try:
+#     from sphinx.setup_command import BuildDoc
+# except ImportError:
+#     pass
+# else:
+#     cmdclass['build_sphinx'] = BuildDoc
 
 # read description
 with open('README.md', 'rb') as f:
@@ -64,14 +64,14 @@ else:
 # are all used in the example below for specifying specific version of the
 # packages that are compatbile with your software.
 install_requires = [
-    'numpy >= 1.12.0',
-    #'pyblast @ https://github.com/CIERA-Northwestern/pyblast/tarball/master',
-    'scipy >= 0.12.1',
-    'matplotlib >= 1.2.0, != 2.1.0, != 2.1.1',
-    'astropy >= 1.1.1, < 3.0.0 ; python_version < \'3\'',
-    #'astropy >= 1.1.1 ; python_version >= \'3\'',
-    #'configparser',
-    #'pandas >= 0.24',
+    # 'numpy >= 1.12.0',
+    # #'pyblast @ https://github.com/CIERA-Northwestern/pyblast/tarball/master',
+    # 'scipy >= 0.12.1',
+    # 'matplotlib >= 1.2.0, != 2.1.0, != 2.1.1',
+    # 'astropy >= 1.1.1, < 3.0.0 ; python_version < \'3\'',
+    # #'astropy >= 1.1.1 ; python_version >= \'3\'',
+    # #'configparser',
+    # #'pandas >= 0.24',
 ]
 
 tests_require = [

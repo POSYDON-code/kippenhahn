@@ -1,29 +1,35 @@
 package:
   name: kippenhahn
-  version: "v0.0.4"
+  version: "v0.0.3"
 
 source:
-  git_rev: v0.0.4
+  git_rev: v0.0.3
   git_url: https://github.com/POSYDON-code/kippenhahn.git
+
+build:
+  noarch: python
+
 
 requirements:
   build:
-    - python
+    - python==3.8
     - setuptools
     - numpy
     - scipy
     - astropy
     - multiprocess
     - matplotlib
+    - sphinx
 
   run:
-    - python
+    - python==3.8
     - setuptools
     - numpy
     - scipy
     - astropy
     - multiprocess
     - matplotlib
+    - sphinx
 
 test:
   imports: kippenhahn
