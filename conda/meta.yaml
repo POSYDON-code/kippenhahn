@@ -1,0 +1,42 @@
+package:
+  name: kippenhahn
+  version: "v0.0.6"
+
+source:
+  git_rev: v0.0.6
+  git_url: https://github.com/POSYDON-code/kippenhahn.git
+
+build:
+  noarch: python
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv
+
+source:
+  path: ..
+
+requirements:
+  build:
+    - python==3.8
+    - setuptools
+    - numpy
+    - scipy
+    - astropy
+    - multiprocess
+    - matplotlib
+    - sphinx
+
+  run:
+    - python==3.8
+    - setuptools
+    - numpy
+    - scipy
+    - astropy
+    - multiprocess
+    - matplotlib
+    - sphinx
+
+test:
+  imports: kippenhahn
+
+about:
+  home: https://github.com/POSYDON-code/kippenhahn
