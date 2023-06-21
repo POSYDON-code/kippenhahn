@@ -391,7 +391,7 @@ def InterpolateOneProfile(profile, NY, Yaxis, Ymin, Ymax, Variable):
     return data1
 
 
-class mesaplot(object):
+class kippenhahn(object):
     def __init__(self, **kwargs):
         """An object containing the output data from a MESA run.
 
@@ -845,7 +845,7 @@ class mesaplot(object):
 
 
 
-    def Kippenhahn(self, ax=None):
+    def plot(self, ax=None):
         """Generate a Kippenhahn diagram
 
         Resulting plot is created and outputed.
@@ -1411,9 +1411,9 @@ if __name__ == "__main__":
 
 
     data_path = "/data/disk1/fragkos/repos/CE_mesa/working/LOGS/"
-    a = mesa(data_path=data_path, parallel=False, abundances=False, log_abundances = True, Yaxis='radius', Xaxis="star_age",
+    a = kippenhahn(data_path=data_path, parallel=False, abundances=False, log_abundances = True, Yaxis='radius', Xaxis="star_age",
         czones=True, Variable='v_div_vesc', orbit=True, masses_TML = [4., 6., 8., 10.,12.,14., 20., 25., 28.])
     a.SetParameters(onscreen=True, cmap = 'jet', cmap_dynamic_range=5, signed_log_cmap=False, tau10=True, tau100=True)
 
 
-    a.Kippenhahn()
+    a.plot()
