@@ -1,9 +1,9 @@
 package:
   name: kippenhahn
-  version: "v0.0.6"
+  version: "0.0.9"
 
 source:
-  git_rev: v0.0.6
+  git_rev: 0.0.9
   git_url: https://github.com/POSYDON-code/kippenhahn.git
 
 build:
