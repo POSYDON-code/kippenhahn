@@ -968,7 +968,7 @@ class kippenhahn(object):
 
 
 
-        if self._param['signed_log_cmap'] and (self._cmap_label is not None):
+        if self._param['signed_log_cmap'] and (self._param['cmap_label'] is not None):
             cmap_label = "sign x log(max(1,abs(" + cmap_label[4:]+"))"
 
 
@@ -991,7 +991,7 @@ class kippenhahn(object):
         if self._param['signed_log_cmap']:
             data_to_plot = np.sign(np.transpose(self._data)) * np.log10(np.maximum(1.,np.abs(np.transpose(self._data))))
         else:
-            data_to_plot = np.log10(np.transpose(self._data))
+            data_to_plot = np.log10(np.maximum(1e-99,np.transpose(self._data)))
 
         #Define the minimum and maximum of the color scale
         # When using signed_log_cmap, ignore cmap_dynamic_range
@@ -1004,8 +1004,11 @@ class kippenhahn(object):
             self._param['cmap_dynamic_range'] = np.nanmax(data_to_plot) - np.nanmin(data_to_plot)
             cmap_min = np.nanmax(data_to_plot)-self._param['cmap_dynamic_range']
             cmap_max = np.nanmax(data_to_plot)
-        else:
+        elif self._param['cmap_dynamic_range']!=0:
             cmap_min = np.nanmax(data_to_plot)-self._param['cmap_dynamic_range']
+            cmap_max = np.nanmax(data_to_plot)
+        else:
+            cmap_min = np.nanmin(data_to_plot)
             cmap_max = np.nanmax(data_to_plot)
 
 
