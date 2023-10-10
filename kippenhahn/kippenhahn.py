@@ -676,19 +676,25 @@ class kippenhahn(object):
             raise(self._param['data_path']+"profiles.index"+" does not contain information about enough profiles files")
 
 
-        #Create an array fromt eh history data that gives you the age of each model for wich you have output a profile
+        #Create an array from the history data that gives you the age of each model for wich you have output a profile
         model_age_from_history =  interp1d(self.history["model_number"], self.history["star_age"])
         self.profile_age = model_age_from_history(self._profile_index["model_number"])
 
-        #Check that the age is increasing in consecutive profiles. If not, then MESA ma have done a back up in which
+        #Check that the age is increasing in consecutive profiles. If not, then MESA may have done a back up in which
         #case we should remove these profiles
-        idx_profiles_to_keep = np.where(self.profile_age[:-1] < self.profile_age[1:])[0]
+        if len(self.profile_age)>1:
+            idx_profiles_to_keep = np.where(self.profile_age < np.append(self.profile_age[1:],2.0*self.profile_age[-1]-self.profile_age[-2]))[0]
+        else:
+            idx_profiles_to_keep = []
         self._profile_index = self._profile_index[:][idx_profiles_to_keep]
         self.profile_age = self.profile_age[idx_profiles_to_keep]
 
-        #Check that the age is increasing in lines of history.data. If not, then MESA ma have done a back up in which
-        #case we should remove these profiles
-        idx_history_lines_to_keep = np.where(self.history['star_age'][:-1] < self.history['star_age'][1:])[0]
+        #Check that the age is increasing in lines of history.data. If not, then MESA may have done a back up in which
+        #case we should remove these history lines
+        if len(self.history['star_age'])>1:
+            idx_history_lines_to_keep = np.where(self.history['star_age'] < np.append(self.history['star_age'][1:],2.0*self.history['star_age'][-1]-self.history['star_age'][-2]))[0]
+        else:
+            idx_history_lines_to_keep = []
         self.history = self.history[:][idx_history_lines_to_keep]
 
 
