@@ -424,7 +424,7 @@ class kippenhahn(object):
         czones (bool) - include convective zone data (default False)
         signed_log_cmap (bool) - use absolute value for color map (default True)
         orbit (bool) -- include secondary's position, for profile plots (default False)
-        tau10 (bool) -- include optical depth of 10 in plot (default True)
+        tau10 (bool) -- include optical depth of 10 in plot (default False)
         tau100 (bool) -- include optical depth of 100 in plot (default False)
         Nprofiles_to_plot (int) -- number of profiles to plot (default 10)
         profiles_to_plot (list[int]) -- profile numbers to be plotted (default [])
@@ -437,7 +437,7 @@ class kippenhahn(object):
                     'Variable':'eps_nuc', 'cmap':'coolwarm', 'cmap_dynamic_range':10, 'Xaxis_dynamic_range':float('Inf'),
                     'Yaxis_dynamic_range':4, 'figure_format':"eps", 'font_small':16, 'font_large':20, 'file_out':'figure',
                     'onscreen':False, 'parallel':True, 'abundances':False, 'log_abundances':True, 'czones':False,
-                    'signed_log_cmap':True, 'orbit':False, 'tau10':True, 'tau100':False, 'Nprofiles_to_plot':10,
+                    'signed_log_cmap':True, 'orbit':False, 'tau10':False, 'tau100':False, 'Nprofiles_to_plot':10,
                     'profiles_to_plot':[], 'masses_TML':[], 'xvals_TML':[], 'Xaxis_min':None, 'Xaxis_max':None, 'Xaxis_label':None,
                     'Yaxis_label':None, 'Yaxis_min':None, 'Yaxis_max':None, 'cmap_min':None, 'cmap_max':None, 'cmap_label':None}
 
