@@ -439,7 +439,8 @@ class kippenhahn(object):
                     'onscreen':False, 'parallel':True, 'abundances':False, 'log_abundances':True, 'czones':False,
                     'signed_log_cmap':True, 'orbit':False, 'tau10':False, 'tau100':False, 'Nprofiles_to_plot':10,
                     'profiles_to_plot':[], 'masses_TML':[], 'xvals_TML':[], 'Xaxis_min':None, 'Xaxis_max':None, 'Xaxis_label':None,
-                    'Yaxis_label':None, 'Yaxis_min':None, 'Yaxis_max':None, 'cmap_min':None, 'cmap_max':None, 'cmap_label':None}
+                    'Yaxis_label':None, 'Yaxis_min':None, 'Yaxis_max':None, 'cmap_min':None, 'cmap_max':None, 'cmap_label':None, 
+                    'ax': None, 'fig' : None}
 
         for key in kwargs:
             if (key in self._param):
@@ -596,6 +597,15 @@ class kippenhahn(object):
     @property
     def cmap_label(self):
         return self._param['cmap_label']
+    
+    @property
+    def ax(self):
+        return self._param['ax']
+    
+    @property
+    def fig(self):
+        return self._param['fig']
+
 
     def help(self):
     #TODO: add a list of all parameters, the default values and the possible option, add a list of functions, and an example
@@ -968,16 +978,17 @@ class kippenhahn(object):
 
 
 
-        if self._param['signed_log_cmap'] and (self._cmap_label is not None):
+        if self._param['signed_log_cmap'] and (cmap_label is not None):
             cmap_label = "sign x log(max(1,abs(" + cmap_label[4:]+"))"
 
 
-        if ax is None:
+        if self._param['ax'] is None:
             fig1 = plt.figure()
             ax1 = fig1.add_subplot(111)
             fig1.subplots_adjust(top=0.80, left=0.12, right=0.9, bottom=0.12)
         else:
-            ax1 = ax
+            ax1 = self._param['ax'] 
+            fig1 = self._param['fig'] 
 
 
         ax1.set_xlabel(Xlabel,fontsize=self._param['font_large'])
@@ -1345,14 +1356,15 @@ class kippenhahn(object):
 
 
         #Re-enforcing the calculated limits for X and Y axis. Without this there may be a white band on the right of the plot.
-        ax1.set_xlim([self._Xaxis_min,self._Xaxis_max])
-        ax1.set_ylim([self._Yaxis_min,self._Yaxis_max])
-        if self._param['abundances']:
-            ax2.set_xlim([self._Xaxis_min,self._Xaxis_max])
-            if self._param['log_abundances']:
-                ax2.set_ylim([1e-5,1.])
-            else:
-                ax2.set_ylim([0.,1.])
+        if ax is not None:
+            ax1.set_xlim([self._Xaxis_min,self._Xaxis_max])
+            ax1.set_ylim([self._Yaxis_min,self._Yaxis_max])
+            if self._param['abundances']:
+                ax2.set_xlim([self._Xaxis_min,self._Xaxis_max])
+                if self._param['log_abundances']:
+                    ax2.set_ylim([1e-5,1.])
+                else:
+                    ax2.set_ylim([0.,1.])
 
 
 #        fig1.tight_layout()
