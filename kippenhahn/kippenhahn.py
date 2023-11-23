@@ -431,6 +431,11 @@ class kippenhahn(object):
         masses_TML (list[float]) -- mass locations (in Msun) to trace in radius (default [])
         xvals_TML (list[float]) -- xvals, between 0 and 1, where labels of lines that trace constant mass are places.
                                    Must be same size as masses_TML. If left empty, labels are placed automatically (default [])
+        fig -- Figure object, if not given by the user the object will be created inside the routine (default None)
+        ax -- Axes object, if not given by the user the object will be created inside the routine (default None)
+        cmap_label --  Label for the third quantity ploted as the color map. 
+                    This must be given in case the user needs to plot a quantity that is not pre-defined in the ploting code. (default None)
+        log_cmap -- Define if the quantity ploted using the colormap will be shown in log10 scale or not (default True)
         """
 
         self._param = {'data_path':"./", 'NX':1024, 'NY':1024, 'Yaxis':'mass', 'Xaxis':'star_age',
