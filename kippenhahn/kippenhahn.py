@@ -135,10 +135,10 @@ def InterpolateOneProfile(profile, NY, Yaxis, Ymin, Ymax, Variable):
     Variable (str) -- the variable to be interpolated
         Possible values: eps_nuc, velocity, entropy, total_energy, j_rot,
             eps_recombination, ionization_energy, energy, potential_plus_kinetic,
-            extra_heat, v_div_vesc, v_div_csound, pressure, temperature, density,
+            extra_heat, v_div_v_escape, v_div_csound, pressure, temperature, density,
             tau, opacity, gamma1, gamma3, dq, L_div_Ledd, Lrad_div_Ledd. t_thermal, t_dynamical,
             t_dynamical_down, t_thermal_div_t_dynamical, omega_div_omega_crit, omega
-            super_ad, vconv, vconv_div_vesc, conv_vel_div_csound, total_energy_plus_vconv2
+            super_ad, vconv, vconv_div_v_escape, conv_vel_div_csound, total_energy_plus_vconv2
             t_thermal_div_t_expansion, E_kinetic_div_E_thermal
 
 
@@ -205,12 +205,12 @@ def InterpolateOneProfile(profile, NY, Yaxis, Ymin, Ymax, Variable):
         except Exception:
             raise ValueError("Column 'total_energy' and/or 'energy' is missing from the profile files")
 
-    if (not "v_div_vesc" in profile.dtype.names and (Variable == 'v_div_vesc' )):
+    if (not "v_div_v_escape" in profile.dtype.names and (Variable == 'v_div_v_escape' )):
         G = const.G.to('cm3/(g s2)').value
         Msun = const.M_sun.to('g').value
         Rsun = const.R_sun.to('cm').value
         try:
-            profile = numpy.lib.recfunctions.append_fields(profile,'v_div_vesc',
+            profile = numpy.lib.recfunctions.append_fields(profile,'v_div_v_escape',
                             data = profile['velocity']/np.sqrt(2.*G*(profile['mass']*Msun)/(profile['radius']*Rsun)), asrecarray=True)
         except Exception:
             raise ValueError("Column 'radius' and/or 'velocity' is missing from the profile files")
@@ -325,12 +325,12 @@ def InterpolateOneProfile(profile, NY, Yaxis, Ymin, Ymax, Variable):
         except Exception:
             raise ValueError("Column 'conv_vel' is missing from the profile files")
 
-    if (not "vconv_div_vesc" in profile.dtype.names and (Variable == 'vconv_div_vesc' )):
+    if (not "vconv_div_v_escape" in profile.dtype.names and (Variable == 'vconv_div_v_escape' )):
         G = const.G.to('cm3/(g s2)').value
         Msun = const.M_sun.to('g').value
         Rsun = const.R_sun.to('cm').value
         try:
-            profile = numpy.lib.recfunctions.append_fields(profile,'vconv_div_vesc',
+            profile = numpy.lib.recfunctions.append_fields(profile,'vconv_div_v_escape',
                             data = profile['conv_vel']/np.sqrt(2.*G*(profile['mass']*Msun)/(profile['radius']*Rsun)), asrecarray=True)
         except Exception:
             raise ValueError("Column 'radius' and/or 'conv_vel' is missing from the profile files")
@@ -431,6 +431,11 @@ class kippenhahn(object):
         masses_TML (list[float]) -- mass locations (in Msun) to trace in radius (default [])
         xvals_TML (list[float]) -- xvals, between 0 and 1, where labels of lines that trace constant mass are places.
                                    Must be same size as masses_TML. If left empty, labels are placed automatically (default [])
+        fig -- Figure object, if not given by the user the object will be created inside the routine (default None)
+        ax -- Axes object, if not given by the user the object will be created inside the routine (default None)
+        cmap_label --  Label for the third quantity ploted as the color map. 
+                    This must be given in case the user needs to plot a quantity that is not pre-defined in the ploting code. (default None)
+        log_cmap -- Define if the quantity ploted using the colormap will be shown in log10 scale or not (default True)
         """
 
         self._param = {'data_path':"./", 'NX':1024, 'NY':1024, 'Yaxis':'mass', 'Xaxis':'star_age',
@@ -439,7 +444,8 @@ class kippenhahn(object):
                     'onscreen':False, 'parallel':True, 'abundances':False, 'log_abundances':True, 'czones':False,
                     'signed_log_cmap':True, 'orbit':False, 'tau10':False, 'tau100':False, 'Nprofiles_to_plot':10,
                     'profiles_to_plot':[], 'masses_TML':[], 'xvals_TML':[], 'Xaxis_min':None, 'Xaxis_max':None, 'Xaxis_label':None,
-                    'Yaxis_label':None, 'Yaxis_min':None, 'Yaxis_max':None, 'cmap_min':None, 'cmap_max':None, 'cmap_label':None}
+                    'Yaxis_label':None, 'Yaxis_min':None, 'Yaxis_max':None, 'cmap_min':None, 'cmap_max':None, 'cmap_label':None, 
+                    'ax': None, 'fig' : None, 'log_cmap' : True}
 
         for key in kwargs:
             if (key in self._param):
@@ -596,6 +602,19 @@ class kippenhahn(object):
     @property
     def cmap_label(self):
         return self._param['cmap_label']
+    
+    @property
+    def ax(self):
+        return self._param['ax']
+    
+    @property
+    def fig(self):
+        return self._param['fig']
+    
+    @property
+    def log_cmap(self):
+        return self._param['log_cmap']
+
 
     def help(self):
     #TODO: add a list of all parameters, the default values and the possible option, add a list of functions, and an example
@@ -614,7 +633,7 @@ class kippenhahn(object):
         Yaxis -- mass, radius, q, log_mass, log_radius, log_q
         Variable -- eps_nuc, velocity, entropy, total_energy, j_rot,
             eps_recombination, ionization_energy, energy, potential_plus_kinetic,
-            extra_heat, v_div_vesc, v_div_csound, pressure, temperature, density,
+            extra_heat, v_div_v_escape, v_div_csound, pressure, temperature, density,
             tau, opacity, gamma1, dq,L_div_Ledd, Lrad_div_Ledd, t_thermal, t_dynamical,
             t_dynamical_down, t_thermal_div_t_dynamical, omega_div_omega_crit, omega
 
@@ -628,14 +647,17 @@ class kippenhahn(object):
         if not (self._param['Xaxis'] in ['model_number', 'star_age', 'inv_star_age', 'log_model_number', 'log_star_age',
                 'log_inv_star_age']):
             raise ValueError(self._param['Xaxis']+"not a valid option for parameter Xaxis")
-        if not (self._param['Variable'] in ['eps_nuc', 'velocity', 'entropy', 'total_energy', 'j_rot', 'eps_recombination'
-                , 'ionization_energy', 'energy', 'potential_plus_kinetic', 'extra_heat', 'v_div_vesc',
-                'v_div_csound',    'pressure', 'temperature', 'density', 'tau', 'opacity', 'gamma1', 'gamma3', 'dq',
-                'L_div_Ledd', 'Lrad_div_Ledd', 't_thermal', 't_dynamical', 't_dynamical_down', 't_thermal_div_t_dynamical',
-                 'omega_div_omega_crit', 'omega','super_ad', 'vconv', 'vconv_div_vesc', 'conv_vel_div_csound',
-                 't_thermal_div_t_expansion','E_kinetic_div_E_thermal','total_energy_plus_vconv2']):
-            raise ValueError(self._param['Variable']+"not a valid option for parameter Variable")
-
+        
+        """
+        if (self._param["cmap_label"] is None):
+            if (not (self._param['Variable'] in ['eps_nuc', 'velocity', 'entropy', 'total_energy', 'j_rot', 'eps_recombination'
+                    , 'ionization_energy', 'energy', 'potential_plus_kinetic', 'extra_heat', 'v_div_v_escape',
+                    'v_div_csound',    'pressure', 'temperature', 'density', 'tau', 'opacity', 'gamma1', 'gamma3', 'dq',
+                    'L_div_Ledd', 'Lrad_div_Ledd', 't_thermal', 't_dynamical', 't_dynamical_down', 't_thermal_div_t_dynamical',
+                    'omega_div_omega_crit', 'omega','super_ad', 'vconv', 'vconv_div_v_escape', 'conv_vel_div_csound',
+                    't_thermal_div_t_expansion','E_kinetic_div_E_thermal','total_energy_plus_vconv2'])):
+                raise ValueError(self._param['Variable']+" not a valid option for parameter Variable, you must deffine cmap_label.")
+        """
 
         return
 
@@ -912,7 +934,7 @@ class kippenhahn(object):
             cmap_label = "log(specific potential+kinetic energy [erg/gr])"
         elif self._param['Variable'] == "extra_heat":
             cmap_label = "log(specific injected energy rate [erg/s/gr])"
-        elif self._param['Variable'] == "v_div_vesc":
+        elif self._param['Variable'] == "v_div_v_escape":
             cmap_label = "log($v/v_{esc}$)"
         elif self._param['Variable'] == "v_div_csound":
             cmap_label = "log($v/v_{sound}$)"
@@ -952,7 +974,7 @@ class kippenhahn(object):
             cmap_label = "log($\\nabla - \\nabla_{ad}$)"
         elif self._param['Variable'] == "vconv":
             cmap_label = "log($v_{conv}$ [cm/s])"
-        elif self._param['Variable'] == "vconv_div_vesc":
+        elif self._param['Variable'] == "vconv_div_v_escape":
             cmap_label = "log($v_{conv}/v_{esc}$)"
         elif self._param['Variable'] == "conv_vel_div_csound":
             cmap_label = "log($v_{conv}/v_{sound}$)"
@@ -968,16 +990,17 @@ class kippenhahn(object):
 
 
 
-        if self._param['signed_log_cmap'] and (self._cmap_label is not None):
+        if self._param['signed_log_cmap'] and (cmap_label is not None):
             cmap_label = "sign x log(max(1,abs(" + cmap_label[4:]+"))"
 
 
-        if ax is None:
+        if self._param['ax'] is None:
             fig1 = plt.figure()
             ax1 = fig1.add_subplot(111)
             fig1.subplots_adjust(top=0.80, left=0.12, right=0.9, bottom=0.12)
         else:
-            ax1 = ax
+            ax1 = self._param['ax'] 
+            fig1 = self._param['fig'] 
 
 
         ax1.set_xlabel(Xlabel,fontsize=self._param['font_large'])
@@ -991,7 +1014,10 @@ class kippenhahn(object):
         if self._param['signed_log_cmap']:
             data_to_plot = np.sign(np.transpose(self._data)) * np.log10(np.maximum(1.,np.abs(np.transpose(self._data))))
         else:
-            data_to_plot = np.log10(np.transpose(self._data))
+            if self._param['log_cmap']:
+                data_to_plot = np.log10(np.abs(np.transpose(self._data)))
+            else:
+                data_to_plot = np.transpose(self._data)
 
         #Define the minimum and maximum of the color scale
         # When using signed_log_cmap, ignore cmap_dynamic_range
@@ -1345,14 +1371,15 @@ class kippenhahn(object):
 
 
         #Re-enforcing the calculated limits for X and Y axis. Without this there may be a white band on the right of the plot.
-        ax1.set_xlim([self._Xaxis_min,self._Xaxis_max])
-        ax1.set_ylim([self._Yaxis_min,self._Yaxis_max])
-        if self._param['abundances']:
-            ax2.set_xlim([self._Xaxis_min,self._Xaxis_max])
-            if self._param['log_abundances']:
-                ax2.set_ylim([1e-5,1.])
-            else:
-                ax2.set_ylim([0.,1.])
+        if ax is not None:
+            ax1.set_xlim([self._Xaxis_min,self._Xaxis_max])
+            ax1.set_ylim([self._Yaxis_min,self._Yaxis_max])
+            if self._param['abundances']:
+                ax2.set_xlim([self._Xaxis_min,self._Xaxis_max])
+                if self._param['log_abundances']:
+                    ax2.set_ylim([1e-5,1.])
+                else:
+                    ax2.set_ylim([0.,1.])
 
 
 #        fig1.tight_layout()
@@ -1409,16 +1436,16 @@ if __name__ == "__main__":
     #Options for Xaxis: 'model_number', 'star_age', 'inv_star_age', 'log_model_number', 'log_star_age', 'log_inv_star_age'
     #Options for Yaxis: 'mass', 'radius', 'q', 'log_mass', 'log_radius', 'log_q'
     #Options for Variable: "eps_nuc", "velocity", "entropy", "total_energy", "j_rot", "eps_recombination", "ionization_energy",
-    #                        "energy", "potential_plus_kinetic", "extra_heat", "v_div_vesc", "v_div_csound"
+    #                        "energy", "potential_plus_kinetic", "extra_heat", "v_div_v_escape", "v_div_csound"
     #                        "pressure", "temperature", "density", "tau", "opacity", "gamma1", "dq"
-    #                        "super_ad", "vconv", "vconv_div_vesc", "conv_vel_div_csound", "total_energy_plus_vconv2"
+    #                        "super_ad", "vconv", "vconv_div_v_escape", "conv_vel_div_csound", "total_energy_plus_vconv2"
     #                       "omega_div_omega_crit", "omega"
 
 
 
     data_path = "/data/disk1/fragkos/repos/CE_mesa/working/LOGS/"
     a = kippenhahn(data_path=data_path, parallel=False, abundances=False, log_abundances = True, Yaxis='radius', Xaxis="star_age",
-        czones=True, Variable='v_div_vesc', orbit=True, masses_TML = [4., 6., 8., 10.,12.,14., 20., 25., 28.])
+        czones=True, Variable='v_div_v_escape', orbit=True, masses_TML = [4., 6., 8., 10.,12.,14., 20., 25., 28.])
     a.SetParameters(onscreen=True, cmap = 'jet', cmap_dynamic_range=5, signed_log_cmap=False, tau10=True, tau100=True)
 
 
